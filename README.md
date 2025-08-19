@@ -1,1 +1,2 @@
-# STM32_Hardfault
+# Hardfault
+Erstellt Ausgabe um einen HardFault auszuwerten.
