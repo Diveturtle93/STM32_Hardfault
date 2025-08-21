@@ -40,7 +40,7 @@
 // MemManage Fault Status Register (MMFSR; 0-7 bits in CFSR)
 //----------------------------------------------------------------------
 #define MMARVALID           ((uint8_t)7u)
-#define MLSPERR             ((uint8_t)5u)   /**< Only on ARM Cortex-M4F. */
+#define MLSPERR             ((uint8_t)5u)									// Nur ARM Cortex-M4F
 #define MSTKERR             ((uint8_t)4u)
 #define MUNSTKERR           ((uint8_t)3u)
 #define DACCVIOL            ((uint8_t)1u)
@@ -50,7 +50,7 @@
 // Bus Fault Status Register (BFSR; 8-15 bits in CFSR)
 //----------------------------------------------------------------------
 #define BFARVALID           ((uint8_t)15u)
-#define LSPERR              ((uint8_t)13u)  /**< Only on ARM Cortex-M4F. */
+#define LSPERR              ((uint8_t)13u)									// Nur ARM Cortex-M4F
 #define STKERR              ((uint8_t)12u)
 #define UNSTKERR            ((uint8_t)11u)
 #define IMPRECISERR         ((uint8_t)10u)
@@ -60,8 +60,8 @@
 
 // Usage Fault Status Register (BFSR; 16-25 bits in CFSR)
 //----------------------------------------------------------------------
-#define DIVBYZERO           ((uint8_t)25u)  /**< Has to be enabled in CCR. */
-#define UNALIGNED           ((uint8_t)24u)  /**< Has to be enabled in CCR. */
+#define DIVBYZERO           ((uint8_t)25u)									// Muss in CCR aktiviert sein
+#define UNALIGNED           ((uint8_t)24u)									// Muss in CCR aktiviert sein
 #define NOCP                ((uint8_t)19u)
 #define INVPC               ((uint8_t)18u)
 #define INVSTATE            ((uint8_t)17u)

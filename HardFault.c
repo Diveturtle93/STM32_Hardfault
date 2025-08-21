@@ -44,6 +44,7 @@ void HardFault_Handler(void)
 //----------------------------------------------------------------------
 void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 {
+	// Variablen definieren
 	uint32_t r0   = stack_frame[0];
 	uint32_t r1   = stack_frame[1];
 	uint32_t r2   = stack_frame[2];
@@ -60,6 +61,7 @@ void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 
 	uartTransmit("\n!!!Hard Fault detected!!!\n", 27);
 
+	// Stack Werte
 	uartTransmit("\nStack frame:\n", 14);
 	uartTransmit("R0 :        0x", 14);
 	uartTransmitNumber(r0, 16);
@@ -86,6 +88,7 @@ void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 	uartTransmitNumber(psr, 16);
 	uartTransmit("\n", 1);
 
+	// Fault Status
 	uartTransmit("\nFault status:\n", 15);
 	uartTransmit("HFSR:       0x", 14);
 	uartTransmitNumber(hfsr, 16);
@@ -102,18 +105,21 @@ void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 	uartTransmit("AFSR:       0x", 14);
 	uartTransmitNumber(afsr, 16);
 	uartTransmit("\n", 1);
-
+	
 	uartTransmit("\nOther:\n", 8);
-	printf("EXC_RETURN: 0x%08lX\n", exc);
-
+	uartTransmit("EXC_RETURN: 0x", 14);
+	uartTransmitNumber(exc, 16);
+	uartTransmit("\n", 1);
+	
+	// Detailierte Ausgabe
 	uartTransmit("\nDetails of the fault status:\n", 30);
 	uartTransmit("Hard fault status:\n", 19);
-
+	
 	if (CHECK_BIT(hfsr, FORCED))
 	{
 		uartTransmit(" - Forced Hard fault.\n", 22);
 	}
-
+	
 	if (CHECK_BIT(hfsr, VECTTBL))
 	{
 		uartTransmit(" - Bus fault on vector table read.\n", 35);
