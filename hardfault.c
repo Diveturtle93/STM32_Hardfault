@@ -232,7 +232,9 @@ void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 	}
 
 	// Software breakpoint
+#ifdef DEBUG
 	__asm volatile("BKPT #0");
+#endif
 
 	// Endlosschleife nach HardFault
 	while(1);
