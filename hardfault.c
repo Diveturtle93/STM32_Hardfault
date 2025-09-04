@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-// Titel	:	HardFault.c
+// Titel	:	hardfault.c
 //----------------------------------------------------------------------
 // Sprache	:	C
 // Datum	:	16.05.2025
@@ -20,8 +20,8 @@
 
 // Einfuegen der eigenen Include Dateien
 //----------------------------------------------------------------------
-#include "HardFault.h"
-#include "BasicUart.h"
+#include "basicuart.h"
+#include "hardfault.h"
 //----------------------------------------------------------------------
 
 void ReportHardFault(uint32_t *hard_fault_values, uint32_t exc);
