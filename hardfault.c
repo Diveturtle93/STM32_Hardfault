@@ -24,7 +24,7 @@
 #include "hardfault.h"
 //----------------------------------------------------------------------
 
-void ReportHardFault(uint32_t *hard_fault_values, uint32_t exc);
+void ReportHardFault (uint32_t *hard_fault_values, uint32_t exc);
 
 //----------------------------------------------------------------------
 void HardFault_Handler(void)
@@ -42,7 +42,7 @@ void HardFault_Handler(void)
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
+void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 {
 	// Variablen definieren
 	uint32_t r0   = stack_frame[0];
@@ -237,6 +237,6 @@ void ReportHardFault(uint32_t *stack_frame, uint32_t exc)
 #endif
 
 	// Endlosschleife nach HardFault
-	while(1);
+	while (1);
 }
 //----------------------------------------------------------------------
