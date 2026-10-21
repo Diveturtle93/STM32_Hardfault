@@ -3,12 +3,12 @@
 //----------------------------------------------------------------------
 // Sprache	:	C
 // Datum	:	16.05.2025
-// Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Hardfault
+// Quelle	:
 //----------------------------------------------------------------------
 
-// Saveguard symbol
+// Sicherheitssymbol
 //----------------------------------------------------------------------
 #pragma once
 //----------------------------------------------------------------------
@@ -29,67 +29,72 @@
 #include "main.h"
 //----------------------------------------------------------------------
 
-// Einfuegen der eigenen Include Dateien
+// Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
 
+//----------------------------------------------------------------------
+
+// Definiere Debug-Symbole
+//----------------------------------------------------------------------
+#ifdef DEBUG
+	#define DEBUG_HARDFAULT
+#endif
 //----------------------------------------------------------------------
 
 // Version definieren
 //----------------------------------------------------------------------
-#define HARDFAULT_MAJOR					0
-#define HARDFAULT_MINOR					0
-#define HARDFAULT_PATCH					0
-#define HARDFAULT_DEV					0
+#define HARDFAULT_MAJOR							0
+#define HARDFAULT_MINOR							0
+#define HARDFAULT_PATCH							0
+#define HARDFAULT_DEV							1
 //----------------------------------------------------------------------
 
-// Definiere Debug Symbols
+// Bitmaske definieren
 //----------------------------------------------------------------------
-
-// Bit masking
-//----------------------------------------------------------------------
-#define CHECK_BIT(REG, POS) ((REG) & (1u << (POS)))
+#define CHECK_BIT(REG, POS)						((REG) & (1u << (POS)))
 //----------------------------------------------------------------------
 
 // Hard Fault Status Register
 //----------------------------------------------------------------------
-#define FORCED              ((uint8_t)30u)
-#define VECTTBL             ((uint8_t)1u)
+#define FORCED									((uint8_t)30u)
+#define VECTTBL									((uint8_t)1u)
 //----------------------------------------------------------------------
 
 // MemManage Fault Status Register (MMFSR; 0-7 bits in CFSR)
 //----------------------------------------------------------------------
-#define MMARVALID           ((uint8_t)7u)
-#define MLSPERR             ((uint8_t)5u)									// Nur ARM Cortex-M4F
-#define MSTKERR             ((uint8_t)4u)
-#define MUNSTKERR           ((uint8_t)3u)
-#define DACCVIOL            ((uint8_t)1u)
-#define IACCVIOL            ((uint8_t)0u)
+#define MMARVALID								((uint8_t)7u)
+#define MLSPERR									((uint8_t)5u)				// Nur mit FPU (Cortex-M4F, M7)
+#define MSTKERR									((uint8_t)4u)
+#define MUNSTKERR								((uint8_t)3u)
+#define DACCVIOL								((uint8_t)1u)
+#define IACCVIOL								((uint8_t)0u)
 //----------------------------------------------------------------------
 
 // Bus Fault Status Register (BFSR; 8-15 bits in CFSR)
 //----------------------------------------------------------------------
-#define BFARVALID           ((uint8_t)15u)
-#define LSPERR              ((uint8_t)13u)									// Nur ARM Cortex-M4F
-#define STKERR              ((uint8_t)12u)
-#define UNSTKERR            ((uint8_t)11u)
-#define IMPRECISERR         ((uint8_t)10u)
-#define PRECISERR           ((uint8_t)9u)
-#define IBUSERR             ((uint8_t)8u)
+#define BFARVALID								((uint8_t)15u)
+#define LSPERR									((uint8_t)13u)				// Nur mit FPU (Cortex-M4F, M7)
+#define STKERR									((uint8_t)12u)
+#define UNSTKERR								((uint8_t)11u)
+#define IMPRECISERR								((uint8_t)10u)
+#define PRECISERR								((uint8_t)9u)
+#define IBUSERR									((uint8_t)8u)
 //----------------------------------------------------------------------
 
-// Usage Fault Status Register (BFSR; 16-25 bits in CFSR)
+// Usage Fault Status Register (UFSR; 16-25 bits in CFSR)
 //----------------------------------------------------------------------
-#define DIVBYZERO           ((uint8_t)25u)									// Muss in CCR aktiviert sein
-#define UNALIGNED           ((uint8_t)24u)									// Muss in CCR aktiviert sein
-#define NOCP                ((uint8_t)19u)
-#define INVPC               ((uint8_t)18u)
-#define INVSTATE            ((uint8_t)17u)
-#define UNDEFINSTR          ((uint8_t)16u)
+#define DIVBYZERO								((uint8_t)25u)				// Muss in CCR aktiviert sein
+#define UNALIGNED								((uint8_t)24u)				// Muss in CCR aktiviert sein
+#define NOCP									((uint8_t)19u)
+#define INVPC									((uint8_t)18u)
+#define INVSTATE								((uint8_t)17u)
+#define UNDEFINSTR								((uint8_t)16u)
 //----------------------------------------------------------------------
 
 // Funktionen definieren
 //----------------------------------------------------------------------
 void HardFault_Handler (void);
+void ReportHardFault (uint32_t *stack_frame, uint32_t exc);
 //----------------------------------------------------------------------
 
 #endif /* INC_HARDFAULT_H_ */

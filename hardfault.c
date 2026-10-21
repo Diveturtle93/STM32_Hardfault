@@ -3,9 +3,9 @@
 //----------------------------------------------------------------------
 // Sprache	:	C
 // Datum	:	16.05.2025
-// Version	:	1.0
 // Autor	:	Diveturtle93
 // Projekt	:	Hardfault
+// Quelle	:
 //----------------------------------------------------------------------
 
 // Einfuegen der standard Include-Dateien
@@ -18,29 +18,33 @@
 
 //----------------------------------------------------------------------
 
-// Einfuegen der eigenen Include Dateien
+// Einfuegen der eigenen Include-Dateien
 //----------------------------------------------------------------------
 #include "basicuart.h"
 #include "hardfault.h"
 //----------------------------------------------------------------------
 
-void ReportHardFault (uint32_t *hard_fault_values, uint32_t exc);
-
+// HardFault Handler
 //----------------------------------------------------------------------
-void HardFault_Handler(void)
+__attribute__((naked)) void HardFault_Handler (void)
 {
-  __asm volatile
-  (
-      "TST    LR, #0b0100;      "
-      "ITE    EQ;               "
-      "MRSEQ  R0, MSP;          "
-      "MRSNE  R0, PSP;          "
-      "MOV    R1, LR;           "
-      "B      ReportHardFault;  "
-  );
+	// naked: Compiler erzeugt keinen Prolog (z. B. push {r7} bei -O0). Ohne
+	// naked wuerde der Prolog SP veraendern, MSP zeigt dann nicht mehr auf den
+	// Stack-Frame und alle Register werden verschoben ausgegeben. Deshalb darf
+	// hier nur Assembler stehen, kein C-Code.
+	__asm volatile
+	(
+		"TST	LR,	#0b0100;  		"
+		"ITE	EQ;					"
+		"MRSEQ	R0, MSP;			"
+		"MRSNE	R0, PSP;			"
+		"MOV	R1, LR;				"
+		"B		ReportHardFault;	"
+	);
 }
 //----------------------------------------------------------------------
 
+// Report HardFault
 //----------------------------------------------------------------------
 void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 {
@@ -231,8 +235,8 @@ void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 		uartTransmit(" - The processor has attempted to execute an undefined instruction.\n", 68);
 	}
 
-	// Software breakpoint
-#ifdef DEBUG
+	// Software-Breakpoint ausloesen
+#ifdef DEBUG_HARDFAULT
 	__asm volatile("BKPT #0");
 #endif
 
