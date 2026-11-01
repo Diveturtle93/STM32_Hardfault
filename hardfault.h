@@ -43,10 +43,10 @@
 
 // Version definieren
 //----------------------------------------------------------------------
-#define HARDFAULT_MAJOR							0
+#define HARDFAULT_MAJOR							1
 #define HARDFAULT_MINOR							0
 #define HARDFAULT_PATCH							0
-#define HARDFAULT_DEV							1
+#define HARDFAULT_DEV							0
 //----------------------------------------------------------------------
 
 // Bitmaske definieren

@@ -39,6 +39,10 @@ diese Fehler zum HardFault. `HFSR.FORCED` ist dann gesetzt, und die eigentliche 
 
 Ohne `DEBUG_HARDFAULT` läuft der Handler nach der Ausgabe in eine Endlosschleife.
 
+Die UART-Ausgabe hängt von `basicuart` ab, das nur mit `DEBUG_BASICUART` sendet. Dieses Symbol
+wird ebenfalls über `DEBUG` gesetzt. Im Release-Build ohne `DEBUG` findet deshalb keine Ausgabe
+statt, der Handler bleibt nur in der Endlosschleife stehen.
+
 ## Ausgegebene Informationen
 
 ### Stack-Frame
@@ -68,10 +72,11 @@ Beim Eintritt in die Exception sichert der Cortex-M-Kern automatisch folgende Re
 
 #### HardFault Status (HFSR)
 
-| Bit       | Beschreibung                                |
-|-----------|---------------------------------------------|
-| `FORCED`  | Eskalierter Fault von MMFSR, BFSR oder UFSR |
-| `VECTTBL` | Bus-Fehler beim Lesen der Vektortabelle     |
+| Bit        | Beschreibung                                                    |
+|------------|-----------------------------------------------------------------|
+| `DEBUGEVT` | Debug-Ereignis ohne aktiven Debugger (z. B. `BKPT`), eskaliert  |
+| `FORCED`   | Eskalierter Fault von MMFSR, BFSR oder UFSR                     |
+| `VECTTBL`  | Bus-Fehler beim Lesen der Vektortabelle                         |
 
 #### MemManage Fault Status (MMFSR, Bits 0–7 in CFSR)
 
@@ -151,18 +156,21 @@ Usage fault status:
 |---------|---------|---------|
 | Linker meldet `multiple definition of 'HardFault_Handler'` | Der von CubeMX erzeugte Handler in `stm32xxxx_it.c` ist noch vorhanden | Handler löschen und in CubeMX unter NVIC → Code generation für „Hard fault interrupt“ „Generate IRQ handler“ abwählen |
 | Fehler kommt nach dem Neugenerieren mit CubeMX wieder | CubeMX legt den Handler bei jeder Generierung neu an | In CubeMX „Generate IRQ handler“ für den Hard fault abwählen |
-| Keine Ausgabe auf UART | UART beim Fehler noch nicht initialisiert, z. B. Fehler vor `MX_USARTx_Init()` | Fehlerstelle mit dem Debugger eingrenzen, UART möglichst früh initialisieren |
+| Keine Ausgabe auf UART | UART beim Fehler noch nicht initialisiert, z. B. Fehler vor `MX_USARTx_Init()` oder `initBasicUart()` | Fehlerstelle mit dem Debugger eingrenzen, UART möglichst früh initialisieren |
+| Keine Ausgabe auf UART im Release-Build | `basicuart` sendet ohne `DEBUG_BASICUART` nichts | Für die Fehlersuche den Debug-Build verwenden |
 | Board bleibt ohne angeschlossenen Debugger hängen | Debug-Build: `BKPT #0` ohne Debugger führt im HardFault zum Lockup | Release-Build ohne `DEBUG` auf das Board spielen |
 | `DIVBYZERO` bzw. `UNALIGNED` wird nie gemeldet | Trap im `CCR` nicht aktiviert | Trap nach Schritt 3 der Verwendung aktivieren |
 
 ## API
 
 ```c
-void HardFault_Handler (void);    // Ersetzt den HardFault-Handler der HAL, wird von der CPU aufgerufen
+void HardFault_Handler (void);                               // Ersetzt den HardFault-Handler der HAL, wird von der CPU aufgerufen
+void ReportHardFault (uint32_t *stack_frame, uint32_t exc);  // Wertet Stack-Frame und Fault-Register aus, gibt sie über UART aus
 ```
 
-`HardFault_Handler()` wird nicht aus der Anwendung aufgerufen. Der Handler steht über seinen Namen
-in der Vektortabelle des Startup-Codes.
+Beide Funktionen werden nicht aus der Anwendung aufgerufen. `HardFault_Handler()` steht über
+seinen Namen in der Vektortabelle des Startup-Codes und springt in `ReportHardFault()`. Diese ist
+nur deshalb öffentlich, weil der Assembler-Prolog sie über ihren Symbolnamen anspringt.
 
 ## Verwendung
 
@@ -206,7 +214,8 @@ unterstützt, da ihnen der `IT`-Befehl und die Fault-Statusregister `CFSR`, `MMA
 ## Abhängigkeiten
 
 - `main.h` – STM32 HAL (CMSIS, `SCB`)
-- [`basicuart.h`](https://github.com/Diveturtle93/STM32_Basicuart) – UART-Sendefunktionen `uartTransmit()` und `uartTransmitNumber()`
+- [`basicuart.h`](https://github.com/Diveturtle93/STM32_Basicuart) – UART-Sendefunktionen `uartTransmit()` und `uartTransmitNumber()`.
+  Die Anwendung muss die Schnittstelle vorher mit `initBasicUart()` festlegen.
 
 ## Lizenz
 
