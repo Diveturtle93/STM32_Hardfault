@@ -118,19 +118,24 @@ void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 	// Detailierte Ausgabe
 	uartTransmit("\nDetails of the fault status:\n", 30);
 	uartTransmit("Hard fault status:\n", 19);
-	
-	if (CHECK_BIT(hfsr, FORCED))
+
+	if (CHECK_BIT(hfsr, DEBUGEVT))											// Debug-Ereignis ohne aktiven Debugger (z.B. BKPT), eskaliert zum HardFault
+	{
+		uartTransmit(" - Debug event has caused a Hard fault.\n", 40);
+	}
+
+	if (CHECK_BIT(hfsr, FORCED))											// Eskalierter Fault (MemManage, Bus, Usage), Ursache steht im CFSR
 	{
 		uartTransmit(" - Forced Hard fault.\n", 22);
 	}
 	
-	if (CHECK_BIT(hfsr, VECTTBL))
+	if (CHECK_BIT(hfsr, VECTTBL))											// Busfehler beim Lesen der Vektortabelle (Exception-Eintritt)
 	{
 		uartTransmit(" - Bus fault on vector table read.\n", 35);
 	}
 
 	uartTransmit("MemManage fault status:\n", 24);
-	if (CHECK_BIT(cfsr, MMARVALID))
+	if (CHECK_BIT(cfsr, MMARVALID))											// MMFAR enthaelt gueltige Fehleradresse
 	{
 		uartTransmit(" - MMAR holds a valid address.\n", 31);
 	}
@@ -139,33 +144,33 @@ void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 		uartTransmit(" - MMAR holds an invalid address.\n", 34);
 	}
 
-	if (CHECK_BIT(cfsr, MLSPERR))
+	if (CHECK_BIT(cfsr, MLSPERR))											// MPU-Verletzung beim Lazy-FP-Stacking, nur mit FPU (Cortex-M4F, M7)
 	{
 		uartTransmit(" - Fault occurred during floating-point lazy state preservation.\n", 65);
 	}
 
-	if (CHECK_BIT(cfsr, MSTKERR))
+	if (CHECK_BIT(cfsr, MSTKERR))											// MPU-Verletzung beim Stacking (Exception-Eintritt)
 	{
 		uartTransmit(" - Stacking has caused an access violation.\n", 44);
 	}
 
-	if (CHECK_BIT(cfsr, MUNSTKERR))
+	if (CHECK_BIT(cfsr, MUNSTKERR))											// MPU-Verletzung beim Unstacking (Exception-Ruecksprung)
 	{
 		uartTransmit(" - Unstacking has caused an access violation.\n", 46);
 	}
 
-	if (CHECK_BIT(cfsr, DACCVIOL))
+	if (CHECK_BIT(cfsr, DACCVIOL))											// Datenzugriff auf geschuetzten Bereich, Adresse in MMFAR
 	{
 		uartTransmit(" - Load or store at a location that does not permit the operation.\n", 67);
 	}
 
-	if (CHECK_BIT(cfsr, IACCVIOL))
+	if (CHECK_BIT(cfsr, IACCVIOL))											// Befehlsabruf aus nicht ausfuehrbarem Bereich (XN)
 	{
 		uartTransmit(" - Instruction fetch from a location that does not permit execution.\n", 69);
 	}
 
 	uartTransmit("Bus fault status:\n", 18);
-	if (CHECK_BIT(cfsr, BFARVALID))
+	if (CHECK_BIT(cfsr, BFARVALID))											// BFAR enthaelt gueltige Fehleradresse
 	{
 		uartTransmit(" - BFAR holds a valid address.\n", 31);
 	}
@@ -174,63 +179,63 @@ void ReportHardFault (uint32_t *stack_frame, uint32_t exc)
 		uartTransmit(" - BFAR holds an invalid address.\n", 34);
 	}
 
-	if (CHECK_BIT(cfsr, LSPERR))
+	if (CHECK_BIT(cfsr, LSPERR))											// Busfehler beim Lazy-FP-Stacking, nur mit FPU (Cortex-M4F, M7)
 	{
 		uartTransmit(" - Fault occurred during floating-point lazy state preservation.\n", 65);
 	}
 
-	if (CHECK_BIT(cfsr, STKERR))
+	if (CHECK_BIT(cfsr, STKERR))											// Busfehler beim Stacking (Exception-Eintritt)
 	{
 		uartTransmit(" - Stacking has caused a Bus fault.\n", 36);
 	}
 
-	if (CHECK_BIT(cfsr, UNSTKERR))
+	if (CHECK_BIT(cfsr, UNSTKERR))											// Busfehler beim Unstacking (Exception-Ruecksprung)
 	{
 		uartTransmit(" - Unstacking has caused a Bus fault.\n", 38);
 	}
 
-	if (CHECK_BIT(cfsr, IMPRECISERR))
+	if (CHECK_BIT(cfsr, IMPRECISERR))										// Unpraeziser Datenbusfehler (gepufferter Schreibzugriff), keine Adresse
 	{
 		uartTransmit(" - Data bus error has occurred, but the return address in the stack is not related to the fault.\n", 97);
 	}
 
-	if (CHECK_BIT(cfsr, PRECISERR))
+	if (CHECK_BIT(cfsr, PRECISERR))											// Praeziser Datenbusfehler, Adresse in BFAR, PC zeigt auf Befehl
 	{
 		uartTransmit(" - Data bus error has occurred, and the return address points to the instruction that caused the fault.\n", 104);
 	}
 
-	if (CHECK_BIT(cfsr, IBUSERR))
+	if (CHECK_BIT(cfsr, IBUSERR))											// Busfehler beim Befehlsabruf
 	{
 		uartTransmit(" - Instruction bus error.\n", 26);
 	}
 
 	uartTransmit("Usage fault status:\n", 20);
-	if (CHECK_BIT(cfsr, DIVBYZERO))
+	if (CHECK_BIT(cfsr, DIVBYZERO))											// Division durch Null (SDIV, UDIV), muss in CCR aktiviert sein (DIV_0_TRP)
 	{
 		uartTransmit(" - The processor has executed an SDIV or UDIV instruction with a divisor of 0.\n", 79);
 	}
 
-	if (CHECK_BIT(cfsr, UNALIGNED))
+	if (CHECK_BIT(cfsr, UNALIGNED))											// Nicht ausgerichteter Zugriff, muss in CCR aktiviert sein (UNALIGN_TRP)
 	{
 		uartTransmit(" - The processor has made an unaligned memory access.\n", 54);
 	}
 
-	if (CHECK_BIT(cfsr, NOCP))
+	if (CHECK_BIT(cfsr, NOCP))												// Coprozessor nicht freigegeben (z.B. FPU-Befehl ohne Freigabe in CPACR)
 	{
 		uartTransmit(" - Attempted to access a coprocessor.\n", 38);
 	}
 
-	if (CHECK_BIT(cfsr, INVPC))
+	if (CHECK_BIT(cfsr, INVPC))												// Ungueltiger EXC_RETURN-Wert beim Exception-Ruecksprung
 	{
 		uartTransmit(" - Illegal attempt to load of EXC_RETURN to the PC.\n", 52);
 	}
 
-	if (CHECK_BIT(cfsr, INVSTATE))
+	if (CHECK_BIT(cfsr, INVSTATE))											// Ungueltiger Ausfuehrungszustand (Thumb-Bit = 0, z.B. Sprung auf gerade Adresse)
 	{
 		uartTransmit(" - Attempted to execute an instruction that makes illegal use of the EPSR.\n", 75);
 	}
 
-	if (CHECK_BIT(cfsr, UNDEFINSTR))
+	if (CHECK_BIT(cfsr, UNDEFINSTR))										// Undefinierter Befehl
 	{
 		uartTransmit(" - The processor has attempted to execute an undefined instruction.\n", 68);
 	}

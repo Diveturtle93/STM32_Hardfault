@@ -56,39 +56,40 @@
 
 // Hard Fault Status Register
 //----------------------------------------------------------------------
-#define FORCED									((uint8_t)30u)
-#define VECTTBL									((uint8_t)1u)
+#define VECTTBL									((uint8_t)1u)				// Busfehler beim Lesen der Vektortabelle (Exception-Eintritt)
+#define FORCED									((uint8_t)30u)				// Eskalierter Fault (MemManage, Bus, Usage), Ursache steht im CFSR
+#define DEBUGEVT								((uint8_t)31u)				// Debug-Ereignis ohne aktiven Debugger (z.B. BKPT), eskaliert zum HardFault
 //----------------------------------------------------------------------
 
 // MemManage Fault Status Register (MMFSR; 0-7 bits in CFSR)
 //----------------------------------------------------------------------
-#define MMARVALID								((uint8_t)7u)
-#define MLSPERR									((uint8_t)5u)				// Nur mit FPU (Cortex-M4F, M7)
-#define MSTKERR									((uint8_t)4u)
-#define MUNSTKERR								((uint8_t)3u)
-#define DACCVIOL								((uint8_t)1u)
-#define IACCVIOL								((uint8_t)0u)
+#define IACCVIOL								((uint8_t)0u)				// Befehlsabruf aus nicht ausfuehrbarem Bereich (XN)
+#define DACCVIOL								((uint8_t)1u)				// Datenzugriff auf geschuetzten Bereich, Adresse in MMFAR
+#define MUNSTKERR								((uint8_t)3u)				// MPU-Verletzung beim Unstacking (Exception-Ruecksprung)
+#define MSTKERR									((uint8_t)4u)				// MPU-Verletzung beim Stacking (Exception-Eintritt)
+#define MLSPERR									((uint8_t)5u)				// MPU-Verletzung beim Lazy-FP-Stacking, nur mit FPU (Cortex-M4F, M7)
+#define MMARVALID								((uint8_t)7u)				// MMFAR enthaelt gueltige Fehleradresse
 //----------------------------------------------------------------------
 
 // Bus Fault Status Register (BFSR; 8-15 bits in CFSR)
 //----------------------------------------------------------------------
-#define BFARVALID								((uint8_t)15u)
-#define LSPERR									((uint8_t)13u)				// Nur mit FPU (Cortex-M4F, M7)
-#define STKERR									((uint8_t)12u)
-#define UNSTKERR								((uint8_t)11u)
-#define IMPRECISERR								((uint8_t)10u)
-#define PRECISERR								((uint8_t)9u)
-#define IBUSERR									((uint8_t)8u)
+#define IBUSERR									((uint8_t)8u)				// Busfehler beim Befehlsabruf
+#define PRECISERR								((uint8_t)9u)				// Praeziser Datenbusfehler, Adresse in BFAR, PC zeigt auf Befehl
+#define IMPRECISERR								((uint8_t)10u)				// Unpraeziser Datenbusfehler (gepufferter Schreibzugriff), keine Adresse
+#define UNSTKERR								((uint8_t)11u)				// Busfehler beim Unstacking (Exception-Ruecksprung)
+#define STKERR									((uint8_t)12u)				// Busfehler beim Stacking (Exception-Eintritt)
+#define LSPERR									((uint8_t)13u)				// Busfehler beim Lazy-FP-Stacking, nur mit FPU (Cortex-M4F, M7)
+#define BFARVALID								((uint8_t)15u)				// BFAR enthaelt gueltige Fehleradresse
 //----------------------------------------------------------------------
 
 // Usage Fault Status Register (UFSR; 16-25 bits in CFSR)
 //----------------------------------------------------------------------
-#define DIVBYZERO								((uint8_t)25u)				// Muss in CCR aktiviert sein
-#define UNALIGNED								((uint8_t)24u)				// Muss in CCR aktiviert sein
-#define NOCP									((uint8_t)19u)
-#define INVPC									((uint8_t)18u)
-#define INVSTATE								((uint8_t)17u)
-#define UNDEFINSTR								((uint8_t)16u)
+#define UNDEFINSTR								((uint8_t)16u)				// Undefinierter Befehl
+#define INVSTATE								((uint8_t)17u)				// Ungueltiger Ausfuehrungszustand (Thumb-Bit = 0, z.B. Sprung auf gerade Adresse)
+#define INVPC									((uint8_t)18u)				// Ungueltiger EXC_RETURN-Wert beim Exception-Ruecksprung
+#define NOCP									((uint8_t)19u)				// Coprozessor nicht freigegeben (z.B. FPU-Befehl ohne Freigabe in CPACR)
+#define UNALIGNED								((uint8_t)24u)				// Nicht ausgerichteter Zugriff, muss in CCR aktiviert sein (UNALIGN_TRP)
+#define DIVBYZERO								((uint8_t)25u)				// Division durch Null (SDIV, UDIV), muss in CCR aktiviert sein (DIV_0_TRP)
 //----------------------------------------------------------------------
 
 // Funktionen definieren
